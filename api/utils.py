@@ -4,7 +4,6 @@ import time
 import requests
 import pycountry
 
-# === Configuration ===
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # Use /tmp for caching on Vercel (only writable directory)
@@ -12,7 +11,6 @@ CACHE_DIR = "/tmp" if os.getenv("VERCEL") else "."
 CACHE_FILE = os.path.join(CACHE_DIR, "repo_cache.json")
 LOCATION_CACHE_FILE = os.path.join(CACHE_DIR, "user_locations.json")
 
-# === Cache Helpers ===
 def load_json(filename):
     if os.path.exists(filename):
         try:
@@ -34,7 +32,6 @@ def save_json(filename, data):
 repo_cache = load_json(CACHE_FILE)
 user_locations = load_json(LOCATION_CACHE_FILE)
 
-# === Country Resolution ===
 COUNTRY_MAP = [
     ("united states", "us"),
     ("united kingdom", "gb"),
@@ -83,7 +80,6 @@ def resolve_country_code(location):
                 return country.alpha_2.lower()
     return None
 
-# === Data Fetching ===
 def get_all_contributors(repo_name, force_refresh=False):
     """Fetch all contributors by paginating through GitHub API."""
     now = time.time()
@@ -133,7 +129,6 @@ def get_all_contributors(repo_name, force_refresh=False):
         
         users_data.append({"login": username, "location": location})
 
-    # Save cache
     save_json(LOCATION_CACHE_FILE, user_locations)
     repo_cache[repo_name] = {"timestamp": now, "data": users_data}
     save_json(CACHE_FILE, repo_cache)

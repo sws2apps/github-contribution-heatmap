@@ -199,11 +199,10 @@ def render_map_with_list(country_counts):
     total_countries = len(country_counts)
     total_contributors = sum(country_counts.values())
 
-    # Card dimensions - bigger map, wider list for full names
     card_w = 1200
     card_h = 620
-    map_area_w = 800  # Bigger map
-    list_area_x = map_area_w + 30  # List column starts here
+    map_area_w = 800
+    list_area_x = map_area_w + 30
     
     final_svg = etree.Element("svg", 
         width=str(card_w), 
@@ -270,11 +269,9 @@ def render_map_with_list(country_counts):
     for child in orig_root: 
         clone_elements(child, outlines_container, True, country_counts, max_count)
 
-    # === Country List ===
-    list_x = list_area_x + 15  # Extra left padding for country names
+    list_x = list_area_x + 15
     list_w = card_w - list_x - 40
     
-    # List header - show "Top X Countries"
     display_count = min(10, len(country_counts))
     etree.SubElement(final_svg, "text", x=str(list_x), y="60", attrib={"class": "list-title"}).text = f"TOP {display_count} COUNTRIES"
     etree.SubElement(final_svg, "line", x1=str(list_area_x), y1="90", x2=str(card_w - 40), y2="90", attrib={"class": "divider"})
@@ -282,11 +279,10 @@ def render_map_with_list(country_counts):
     # Sort countries by count (descending)
     sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
     
-    # Display up to 10 countries
     max_display = min(10, len(sorted_countries))
     row_height = 38
     start_y = 120
-    bar_max_width = 80  # Bar width
+    bar_max_width = 80
     
     for i, (code, count) in enumerate(sorted_countries[:max_display]):
         y = start_y + i * row_height
@@ -304,8 +300,7 @@ def render_map_with_list(country_counts):
             attrib={"class": "country-count", "text-anchor": "end"}).text = str(count)
         
         # Bar (grows right-to-left, ends before the count)
-        bar_width = (count / max_count) * bar_max_width
-        bar_x = count_x - 28 - bar_width  # Bar ends 28px before count (smaller gap)
+        bar_x = count_x - 28 - bar_width
         etree.SubElement(final_svg, "rect", 
             x=str(bar_x), y=str(y - 12), 
             width=str(bar_width), height="18",
