@@ -7,6 +7,7 @@ import os
 import math
 from lxml import etree
 from utils import get_all_contributors, resolve_country_code
+from data import COUNTRY_NAMES
 
 widget_bp = Blueprint('widget', __name__)
 
@@ -29,46 +30,6 @@ def get_color(count, max_count):
     
     return f"#{r:02x}{g:02x}{b:02x}"
 
-
-COUNTRY_NAMES = {
-    "AF": "Afghanistan", "AL": "Albania", "DZ": "Algeria", "AI": "Anguilla", "AM": "Armenia", 
-    "AW": "Aruba", "AT": "Austria", "BH": "Bahrain", "BD": "Bangladesh", "BB": "Barbados", 
-    "BY": "Belarus", "BE": "Belgium", "BZ": "Belize", "BJ": "Benin", "BM": "Bermuda", 
-    "BT": "Bhutan", "BO": "Bolivia", "BA": "Bosnia and Herzegovina", "BW": "Botswana", 
-    "BR": "Brazil", "VG": "British Virgin Islands", "BN": "Brunei Darussalam", "BG": "Bulgaria", 
-    "BF": "Burkina Faso", "BI": "Burundi", "KH": "Cambodia", "CM": "Cameroon", 
-    "CF": "Central African Republic", "TD": "Chad", "CO": "Colombia", "CR": "Costa Rica", 
-    "HR": "Croatia", "CU": "Cuba", "CW": "Curaçao", "CZ": "Czech Republic", "CI": "Côte d'Ivoire", 
-    "KP": "Dem. Rep. Korea", "CD": "Democratic Republic of the Congo", "DJ": "Djibouti", 
-    "DM": "Dominica", "DO": "Dominican Republic", "EC": "Ecuador", "EG": "Egypt", 
-    "SV": "El Salvador", "GQ": "Equatorial Guinea", "ER": "Eritrea", "EE": "Estonia", 
-    "ET": "Ethiopia", "FI": "Finland", "GF": "French Guiana", "GA": "Gabon", "GE": "Georgia", 
-    "DE": "Germany", "GH": "Ghana", "GL": "Greenland", "GD": "Grenada", "GU": "Guam", 
-    "GT": "Guatemala", "GN": "Guinea", "GW": "Guinea-Bissau", "GY": "Guyana", "HT": "Haiti", 
-    "HN": "Honduras", "HU": "Hungary", "IS": "Iceland", "IN": "India", "IR": "Iran", 
-    "IQ": "Iraq", "IE": "Ireland", "IL": "Israel", "JM": "Jamaica", "JO": "Jordan", 
-    "KZ": "Kazakhstan", "KE": "Kenya", "XK": "Kosovo", "KW": "Kuwait", "KG": "Kyrgyzstan", 
-    "LA": "Lao PDR", "LV": "Latvia", "LB": "Lebanon", "LS": "Lesotho", "LR": "Liberia", 
-    "LY": "Libya", "LT": "Lithuania", "LU": "Luxembourg", "MK": "Macedonia", "MG": "Madagascar", 
-    "MW": "Malawi", "MV": "Maldives", "ML": "Mali", "MH": "Marshall Islands", "MQ": "Martinique", 
-    "MR": "Mauritania", "YT": "Mayotte", "MX": "Mexico", "MD": "Moldova", "MN": "Mongolia", 
-    "ME": "Montenegro", "MS": "Montserrat", "MA": "Morocco", "MZ": "Mozambique", "MM": "Myanmar", 
-    "NA": "Namibia", "NR": "Nauru", "NP": "Nepal", "NL": "Netherlands", "BQBO": "Netherlands", 
-    "NI": "Nicaragua", "NE": "Niger", "NG": "Nigeria", "PK": "Pakistan", "PW": "Palau", 
-    "PS": "Palestine", "PA": "Panama", "PY": "Paraguay", "PE": "Peru", "PL": "Poland", 
-    "PT": "Portugal", "QA": "Qatar", "CG": "Republic of Congo", "KR": "Republic of Korea", 
-    "RE": "Reunion", "RO": "Romania", "RW": "Rwanda", "BQSA": "Saba (Netherlands)", 
-    "LC": "Saint Lucia", "VC": "Saint Vincent and the Grenadines", "BL": "Saint-Barthélemy", 
-    "MF": "Saint-Martin", "SA": "Saudi Arabia", "SN": "Senegal", "RS": "Serbia", 
-    "SL": "Sierra Leone", "SX": "Sint Maarten", "SK": "Slovakia", "SI": "Slovenia", 
-    "SO": "Somalia", "ZA": "South Africa", "SS": "South Sudan", "ES": "Spain", "LK": "Sri Lanka", 
-    "BQSE": "St. Eustatius (Netherlands)", "SD": "Sudan", "SR": "Suriname", "SZ": "Swaziland", 
-    "SE": "Sweden", "CH": "Switzerland", "SY": "Syria", "TW": "Taiwan", "TJ": "Tajikistan", 
-    "TZ": "Tanzania", "TH": "Thailand", "GM": "The Gambia", "TL": "Timor-Leste", "TG": "Togo", 
-    "TN": "Tunisia", "TM": "Turkmenistan", "TV": "Tuvalu", "UG": "Uganda", "UA": "Ukraine", 
-    "AE": "United Arab Emirates", "UY": "Uruguay", "UZ": "Uzbekistan", "VE": "Venezuela", 
-    "VN": "Vietnam", "EH": "Western Sahara", "YE": "Yemen", "ZM": "Zambia", "ZW": "Zimbabwe"
-}
 
 def get_country_name(code):
     """Get full country name from manual mapping or ISO code."""
@@ -147,13 +108,18 @@ def render_map_only(country_counts):
     style_elem = etree.SubElement(final_svg, "style")
     style_elem.text = """
         @import url('https://rsms.me/inter/inter.css');
-        .card { fill: #f9fafb; rx: 16; }
+        .card { fill: #f1f5f9; rx: 16; }
         .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #0f172a; }
         .badge-bg { fill: #dbeafe; rx: 18; }
         .badge-text { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; }
         .divider { stroke: #e2e8f0; stroke-width: 1; }
         .country-fill { stroke: none; }
         .country-outline { fill: none; stroke: #334155; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
+        
+        @media (max-width: 600px) {
+            .title { font-size: 32px; }
+            .badge-text { font-size: 16px; }
+        }
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="16", attrib={"class": "card"})
@@ -218,7 +184,7 @@ def render_map_with_list(country_counts):
     style_elem = etree.SubElement(final_svg, "style")
     style_elem.text = """
         @import url('https://rsms.me/inter/inter.css');
-        .card { fill: #f9fafb; rx: 16; }
+        .card { fill: #f1f5f9; rx: 16; }
         .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #0f172a; }
         .badge-bg { fill: #dbeafe; rx: 18; }
         .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; }
@@ -230,6 +196,13 @@ def render_map_with_list(country_counts):
         .country-count { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: #1e40af; }
         .country-bar { rx: 4; }
         .list-divider { stroke: #e2e8f0; stroke-width: 1; }
+
+        @media (max-width: 600px) {
+            .title { font-size: 40px; }
+            .badge-text { font-size: 20px; }
+            .list-title { font-size: 24px; }
+            .country-name, .country-count { font-size: 22px; }
+        }
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="16", attrib={"class": "card"})
