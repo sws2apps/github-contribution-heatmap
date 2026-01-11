@@ -4,7 +4,7 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 
 ## Example
 
-![Contribution Map Example](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=list)
+![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=list)
 
 *Example generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository.*
 
