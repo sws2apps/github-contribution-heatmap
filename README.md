@@ -21,7 +21,7 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 Add this to your README.md:
 
 ```markdown
-![Contributors](https://your-deployment.vercel.app/api/heatmap?repo=OWNER/REPO)
+![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO)
 ```
 
 ### Variants
@@ -33,7 +33,7 @@ Add this to your README.md:
 
 ```markdown
 <!-- Map with country list -->
-![Contributors](https://your-deployment.vercel.app/api/heatmap?repo=OWNER/REPO&variant=list)
+![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO&variant=list)
 ```
 
 ## Self-Hosting
