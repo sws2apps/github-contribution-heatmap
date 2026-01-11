@@ -2,11 +2,15 @@
 
 Embeddable SVG widget that visualizes the geographic distribution of your repository's contributors. Shows all-time contributor data on a world map with country-level heatmap coloring.
 
-## Example
+## Variants
 
-![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=list)
+### Map Only (Default)
+![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map)
 
-*Example generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository.*
+### Map + List
+![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=list)
+
+*Examples generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository.*
 
 ## Features
 
