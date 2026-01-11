@@ -52,8 +52,8 @@ Add this to your README.md:
 ### Local Development
 
 ```bash
-git clone https://github.com/ux-git/github-contribution-map.git
-cd github-contribution-map
+git clone https://github.com/ux-git/github-contribution-heatmap.git
+cd github-contribution-heatmap
 
 python -m venv venv
 source venv/bin/activate
