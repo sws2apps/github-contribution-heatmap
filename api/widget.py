@@ -5,13 +5,13 @@ This module contains the production widget endpoint.
 from flask import Blueprint, request, Response
 import os
 import math
-import pycountry
 from lxml import etree
+from utils import get_all_contributors, resolve_country_code
 
 widget_bp = Blueprint('widget', __name__)
 
 def get_color(count, max_count):
-    """Returns an interpolated blue shade from #93c5fd (1) to #1e40af (max)."""
+    """Returns an interpolated blue shade from light to dark blue."""
     if count == 0:
         return "#ffffff"
     
@@ -20,7 +20,6 @@ def get_color(count, max_count):
     else:
         intensity = 0
     
-    # Start with a more visible blue (#93c5fd) instead of very light (#dbeafe)
     start_r, start_g, start_b = 147, 197, 253
     end_r, end_g, end_b = 30, 64, 175
     
@@ -332,8 +331,6 @@ def heatmap():
         variant: 'map' (default) or 'list' (map + country list)
         refresh: '1' to force refresh cache
     """
-    from main import get_all_contributors, resolve_country_code
-    
     repo = request.args.get('repo', 'sws2apps/organized-app')
     variant = request.args.get('variant', 'map')
     force_refresh = request.args.get('refresh') == '1'
