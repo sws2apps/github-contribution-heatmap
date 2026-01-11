@@ -258,12 +258,22 @@ def render_map_with_list(country_counts):
     sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
     
     max_display = min(10, len(sorted_countries))
-    row_height = 38
-    start_y = 120
+    
+    # Calculate available height and distribute evenly
+    list_start_y = 120
+    list_end_y = card_h - 40
+    available_height = list_end_y - list_start_y
+    
+    # Evenly distribute rows across available height
+    if max_display > 1:
+        row_spacing = available_height / max_display
+    else:
+        row_spacing = available_height
+    
     bar_max_width = 80
     
     for i, (code, count) in enumerate(sorted_countries[:max_display]):
-        y = start_y + i * row_height
+        y = list_start_y + i * row_spacing + row_spacing * 0.5  # Center text in each row space
         country_name = get_country_name(code)
         
         # No truncation - show full country names
