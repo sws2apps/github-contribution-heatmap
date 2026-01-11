@@ -5,7 +5,7 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 ## Variants
 
 ### Map + List (Default)
-![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=list)
+![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app)
 
 ### Map Only
 ![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map)
@@ -17,7 +17,7 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 - **All-time contributor stats** - Aggregates location data from all contributors
 - **World map heatmap** - Visual intensity based on contributor count per country
 - **Country leaderboard** - Optional sidebar showing top 10 countries
-- **Auto-caching** - 1-hour cache to respect GitHub API rate limits
+- **Auto-caching** - 24-hour cache to respect GitHub API rate limits
 - **SVG output** - Crisp rendering at any size, works in GitHub READMEs
 
 ## Usage
@@ -78,7 +78,7 @@ GET /api/heatmap
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `repo` | string | Yes | GitHub repository (owner/name) |
-| `variant` | string | No | `map` or `list` (default: `map`) |
+| `variant` | string | No | `list` or `map` (default: `list`) |
 | `refresh` | string | No | Set to `1` to bypass cache |
 
 ## How It Works
