@@ -15,8 +15,5 @@
             "src": "/(.*)",
             "dest": "api/main.py"
         }
-    ],
-    "env": {
-        "GITHUB_TOKEN": "@github-token"
-    }
+    ]
 }
