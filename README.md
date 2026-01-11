@@ -1,4 +1,4 @@
-# GitHub Contribution Heatmap
+# GitHub Contributors Heatmap
 
 Embeddable SVG widget that visualizes the geographic distribution of your repository's contributors. Shows all-time contributor data on a world map with country-level heatmap coloring.
 

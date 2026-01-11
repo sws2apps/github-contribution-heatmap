@@ -157,7 +157,7 @@ def render_map_only(country_counts):
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="16", attrib={"class": "card"})
-    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contribution heatmap"
+    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contributors heatmap"
     
     badge_val = f"{total_countries} COUNTRIES"
     badge_w = 150
@@ -232,7 +232,7 @@ def render_map_with_list(country_counts):
     etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="16", attrib={"class": "card"})
     
     # Header
-    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contribution heatmap"
+    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contributors heatmap"
     badge_val = f"{total_countries} COUNTRIES"
     badge_w = 150
     badge_x = map_area_w - badge_w
