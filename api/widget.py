@@ -184,7 +184,7 @@ def render_map_with_list(country_counts):
     style_elem = etree.SubElement(final_svg, "style")
     style_elem.text = """
         @import url('https://rsms.me/inter/inter.css');
-        .card { fill: #f1f5f9; rx: 12; }
+        .card { fill: #f1f5f9; rx: 16; }
         .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #0f172a; }
         .badge-bg { fill: #dbeafe; rx: 18; }
         .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; }
