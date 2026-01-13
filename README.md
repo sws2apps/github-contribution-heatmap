@@ -7,8 +7,14 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 ### Map + List (Default)
 ![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app)
 
+### Map + List (Dark)
+![Map + List Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=dark)
+
 ### Map Only
 ![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map)
+
+### Map Only (Dark)
+![Map Only Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=dark)
 
 *Examples generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository.*
 
@@ -34,10 +40,14 @@ Add this to your README.md:
 |---------|-----------|-------------|
 | Map + List | `variant=list` (default) | Map with top 10 countries sidebar |
 | Map only | `variant=map` | World map with heatmap coloring |
+| Dark theme | `theme=dark` | Dark mode variant (works with both) |
 
 ```markdown
 <!-- Map with country list (Default) -->
 ![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO)
+
+<!-- Dark mode -->
+![Contributors Heatmap Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO&theme=dark)
 ```
 
 ## Self-Hosting
@@ -79,6 +89,7 @@ GET /api/heatmap
 |-----------|------|----------|-------------|
 | `repo` | string | Yes | GitHub repository (owner/name) |
 | `variant` | string | No | `list` or `map` (default: `list`) |
+| `theme` | string | No | `light` or `dark` (default: `light`) |
 | `refresh` | string | No | Set to `1` to bypass cache |
 
 ## How It Works
