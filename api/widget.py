@@ -32,17 +32,18 @@ def get_color(count, max_count):
 
 
 def get_color_dark(count, max_count):
-    """Returns an interpolated blue shade for dark mode."""
+    """Returns an interpolated blue shade for dark mode (GitHub-inspired "really dark")."""
     if count == 0:
-        return "#1e293b"
+        return "#161b22"
     
     if max_count > 1:
         intensity = math.log(count) / math.log(max_count) if count > 1 else 0
     else:
         intensity = 0
     
-    start_r, start_g, start_b = 59, 90, 152
-    end_r, end_g, end_b = 37, 99, 235
+    # Using GitHub-inspired dark blue shades
+    start_r, start_g, start_b = 31, 111, 235 # #1f6feb
+    end_r, end_g, end_b = 88, 166, 255   # #58a6ff
     
     r = int(start_r + (end_r - start_r) * intensity)
     g = int(start_g + (end_g - start_g) * intensity)
@@ -130,14 +131,14 @@ def render_map_only(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
-            .card { fill: #0f172a; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #f1f5f9; }
-            .badge-bg { fill: #1e40af; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #bfdbfe; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: #bfdbfe; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #334155; stroke-width: 1; }
+            .card { fill: #0d1117; rx: 10; }
+            .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #c9d1d9; }
+            .badge-bg { fill: #1f6feb; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .divider { stroke: #30363d; stroke-width: 1; }
             .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #64748b; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
+            .country-outline { fill: none; stroke: #30363d; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
             
@@ -223,7 +224,7 @@ def render_map_only(country_counts, theme='light'):
     ty = 130 + (target_h - oh * scale) / 2 - oy * scale
 
     color_fn = get_color_dark if is_dark else get_color
-    empty_fill = '#1e293b' if is_dark else '#ffffff'
+    empty_fill = '#161b22' if is_dark else '#ffffff'
     
     fills_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
     for child in orig_root: 
@@ -260,21 +261,21 @@ def render_map_with_list(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
-            .card { fill: #0f172a; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #f1f5f9; }
-            .badge-bg { fill: #1e40af; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #bfdbfe; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; fill: #bfdbfe; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #334155; stroke-width: 1; }
+            .card { fill: #0d1117; rx: 10; }
+            .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #c9d1d9; }
+            .badge-bg { fill: #1f6feb; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .divider { stroke: #30363d; stroke-width: 1; }
             .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #64748b; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
-            .list-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #94a3b8; }
-            .country-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: #cbd5e1; }
-            .country-count { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: #60a5fa; }
-            .list-divider { stroke: #334155; stroke-width: 1; }
+            .country-outline { fill: none; stroke: #30363d; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
+            .list-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #8b949e; }
+            .country-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: #c9d1d9; }
+            .country-count { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: #58a6ff; }
+            .list-divider { stroke: #30363d; stroke-width: 1; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
-
+            
             @media (max-width: 600px) {
                 .title { font-size: 40px; }
                 .badge-desktop { display: none; }
@@ -370,7 +371,7 @@ def render_map_with_list(country_counts, theme='light'):
     ty = 130 + (target_h - oh * scale) / 2 - oy * scale
 
     color_fn = get_color_dark if is_dark else get_color
-    empty_fill = '#1e293b' if is_dark else '#ffffff'
+    empty_fill = '#161b22' if is_dark else '#ffffff'
     
     fills_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
     for child in orig_root: 
