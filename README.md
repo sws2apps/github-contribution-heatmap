@@ -4,21 +4,21 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 
 ## Variants
 
-### Map + List (Default)
+### Map Light
 
-![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=light)
+![Map Light](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=light)
 
-### Map + List (GitHub Dark)
+### Map + List Light
 
-![Map + List Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=dark&v=2)
+![Map + List Light](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=light)
 
-### Map Only
+### Map Dark
 
-![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=light)
+![Map Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=dark&v=3)
 
-### Map Only (GitHub Dark)
+### Map + List Dark
 
-![Map Only Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=dark&v=2)
+![Map + List Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=dark&v=3)
 
 _Examples generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository._
 
