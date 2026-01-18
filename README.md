@@ -5,18 +5,22 @@ Embeddable SVG widget that visualizes the geographic distribution of your reposi
 ## Variants
 
 ### Map + List (Default)
-![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app)
 
-### Map + List (Dark)
-![Map + List Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=dark)
+![Map + List](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=light)
+
+### Map + List (GitHub Dark)
+
+![Map + List Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&theme=dark&v=2)
 
 ### Map Only
-![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map)
 
-### Map Only (Dark)
-![Map Only Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=dark)
+![Map Only](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=light)
 
-*Examples generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository.*
+### Map Only (GitHub Dark)
+
+![Map Only Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=sws2apps/organized-app&variant=map&theme=dark&v=2)
+
+_Examples generated for the [sws2apps/organized-app](https://github.com/sws2apps/organized-app) repository._
 
 ## Features
 
@@ -36,23 +40,26 @@ Add this to your README.md:
 
 ### Variants
 
-| Variant | Parameter | Description |
-|---------|-----------|-------------|
-| Map + List | `variant=list` (default) | Map with top 10 countries sidebar |
-| Map only | `variant=map` | World map with heatmap coloring |
-| Dark theme | `theme=dark` | Dark mode variant (works with both) |
+| Variant    | Parameter                | Description                         |
+| ---------- | ------------------------ | ----------------------------------- |
+| Map + List | `variant=list` (default) | Map with top 10 countries sidebar   |
+| Map only   | `variant=map`            | World map with heatmap coloring     |
+| Dark theme | `theme=dark`             | Dark mode variant (works with both) |
 
 ```markdown
 <!-- Map with country list (Default) -->
+
 ![Contributors Heatmap](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO)
 
 <!-- Dark mode -->
+
 ![Contributors Heatmap Dark](https://github-contribution-heatmap.vercel.app/api/heatmap?repo=OWNER/REPO&theme=dark)
 ```
 
 ## Self-Hosting
 
 ### Requirements
+
 - Python 3.9+
 - GitHub Personal Access Token (for API rate limits)
 
@@ -85,12 +92,12 @@ Server runs at `http://localhost:5002`
 GET /api/heatmap
 ```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `repo` | string | Yes | GitHub repository (owner/name) |
-| `variant` | string | No | `list` or `map` (default: `list`) |
-| `theme` | string | No | `light` or `dark` (default: `light`) |
-| `refresh` | string | No | Set to `1` to bypass cache |
+| Parameter | Type   | Required | Description                          |
+| --------- | ------ | -------- | ------------------------------------ |
+| `repo`    | string | Yes      | GitHub repository (owner/name)       |
+| `variant` | string | No       | `list` or `map` (default: `list`)    |
+| `theme`   | string | No       | `light` or `dark` (default: `light`) |
+| `refresh` | string | No       | Set to `1` to bypass cache           |
 
 ## How It Works
 

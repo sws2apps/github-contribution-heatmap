@@ -430,10 +430,10 @@ def render_map_with_list(country_counts, theme='light'):
             fill=color_fn(count, max_count),
             attrib={"class": "country-bar"})
 
-    # Show remaining count if more than 12
+    # Show remaining count if more than 10
     if len(sorted_countries) > max_display:
         remaining = len(sorted_countries) - max_display
-        y = start_y + max_display * row_height
+        y = list_start_y + max_display * row_spacing + row_spacing * 0.5
         etree.SubElement(final_svg, "text", x=str(list_x), y=str(y + 4), attrib={"class": "list-title"}).text = f"+{remaining} more countries"
 
     return etree.tostring(final_svg, pretty_print=True, xml_declaration=True, encoding="utf-8")
@@ -472,6 +472,4 @@ def heatmap():
         return Response(svg_output, mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache, max-age=0'})
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
         return Response(f"Internal Error: {e}", status=500)
