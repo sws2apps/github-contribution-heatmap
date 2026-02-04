@@ -192,7 +192,7 @@ def render_map_only(country_counts, theme='light'):
                      attrib={"class": "badge-text"}).text = badge_val
     
     # Mobile badge (larger size)
-    badge_w_mobile = max(180, text_length * 13)  # Larger for mobile
+    badge_w_mobile = max(200, text_length * 16)  # Larger for mobile
     badge_h_mobile = 36  # Taller for mobile
     badge_x_mobile = card_w - badge_w_mobile - 40
     badge_y_mobile = 36
@@ -335,7 +335,7 @@ def render_map_with_list(country_counts, theme='light'):
                      attrib={"class": "badge-text"}).text = badge_val
     
     # Mobile badge (larger size)
-    badge_w_mobile = max(220, text_length * 15)  # Larger for mobile
+    badge_w_mobile = max(260, text_length * 20)  # Larger for mobile
     badge_h_mobile = 44  # Taller for mobile
     badge_x_mobile = map_area_w - badge_w_mobile
     badge_y_mobile = 34
