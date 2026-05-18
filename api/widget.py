@@ -188,7 +188,7 @@ def render_map_only(country_counts, theme='light'):
                      attrib={"class": "badge-bg"})
     etree.SubElement(final_svg, "text",
                      x=str(badge_x + badge_w / 2),
-                     y=str(badge_y + badge_h / 2 + 1),
+                     y=str(badge_y + badge_h / 2 + 2),
                      attrib={"class": "badge-text"}).text = badge_val
 
     etree.SubElement(final_svg, "line",
@@ -233,8 +233,8 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
 
     card_w = 1200
     card_h = 620
-    map_area_w = 800
-    list_area_x = map_area_w + 30
+    map_area_w = 720
+    list_area_x = map_area_w + 40
     
     final_svg = etree.Element("svg",
         width="100%",
@@ -271,9 +271,9 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         .country-fill    {{ stroke: none; }}
         .country-outline {{ fill: none; stroke: {outline_clr}; stroke-width: 0.4;
                            stroke-linejoin: round; pointer-events: none; opacity: {outline_op}; }}
-        .list-title   {{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: {list_lbl_clr}; }}
-        .country-name {{ font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; fill: {cname_clr}; }}
-        .country-count{{ font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 700; fill: {ccount_clr}; }}
+        .list-title   {{ font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: {list_lbl_clr}; }}
+        .country-name {{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 500; fill: {cname_clr}; }}
+        .country-count{{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; fill: {ccount_clr}; }}
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0",
@@ -296,7 +296,7 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
                      attrib={"class": "badge-bg"})
     etree.SubElement(final_svg, "text",
                      x=str(badge_x + badge_w / 2),
-                     y=str(badge_y + badge_h / 2 + 1),
+                     y=str(badge_y + badge_h / 2 + 2),
                      attrib={"class": "badge-text"}).text = badge_val
 
     etree.SubElement(final_svg, "line",
