@@ -438,8 +438,9 @@ def heatmap() -> Response:
         return Response(
             svg_output,
             mimetype="image/svg+xml",
-            # Temporarily no-store to force Vercel edge cache purge across all variants
-            headers={"Cache-Control": "no-store"},
+            # max-age=0: no browser caching. s-maxage=86400: Vercel edge caches for 24h.
+            # stale-while-revalidate: serve stale instantly while background refresh runs.
+            headers={"Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400"},
         )
 
     except Exception as exc:  # noqa: BLE001
