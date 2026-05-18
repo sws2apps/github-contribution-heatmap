@@ -55,9 +55,9 @@ def get_color_dark(count, max_count):
     else:
         intensity = 0
     
-    # Using GitHub-inspired dark blue shades
-    start_r, start_g, start_b = 31, 111, 235 # #1f6feb
-    end_r, end_g, end_b = 88, 166, 255   # #58a6ff
+    # Dull, washed-out slate blue for lowest counts, blending up to vibrant blue
+    start_r, start_g, start_b = 40, 65, 100 
+    end_r, end_g, end_b = 88, 166, 255
     
     r = int(start_r + (end_r - start_r) * intensity)
     g = int(start_g + (end_g - start_g) * intensity)
