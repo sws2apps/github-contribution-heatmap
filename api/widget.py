@@ -133,10 +133,10 @@ def render_map_only(country_counts, theme='light'):
     card_w = 920
     card_h = 620
     
-    final_svg = etree.Element("svg", 
-        width=str(card_w), 
-        height=str(card_h), 
+    final_svg = etree.Element("svg",
+        width="100%",
         viewBox=f"0 0 {card_w} {card_h}",
+        style=f"max-width:{card_w}px",
         version="1.1",
         xmlns="http://www.w3.org/2000/svg"
     )
@@ -292,10 +292,10 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     map_area_w = 800
     list_area_x = map_area_w + 30
     
-    final_svg = etree.Element("svg", 
-        width=str(card_w), 
-        height=str(card_h), 
+    final_svg = etree.Element("svg",
+        width="100%",
         viewBox=f"0 0 {card_w} {card_h}",
+        style=f"max-width:{card_w}px",
         version="1.1",
         xmlns="http://www.w3.org/2000/svg"
     )
