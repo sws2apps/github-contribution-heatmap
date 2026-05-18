@@ -449,9 +449,9 @@ def heatmap() -> Response:
         return Response(
             svg_output,
             mimetype="image/svg+xml",
-            # max-age=0: no browser cache. s-maxage=0: force Vercel edge to always regenerate.
-            # Re-enable s-maxage=86400 once stale cache issue is confirmed resolved.
-            headers={"Cache-Control": "public, max-age=0, s-maxage=0"},
+            # max-age=0: no browser cache. s-maxage=86400: Vercel edge caches for 24h.
+            # stale-while-revalidate: serve stale instantly while background refresh runs.
+            headers={"Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400"},
         )
 
     except Exception as exc:  # noqa: BLE001
