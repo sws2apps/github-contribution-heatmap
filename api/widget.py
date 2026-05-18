@@ -435,7 +435,8 @@ def heatmap() -> Response:
         return Response(
             svg_output,
             mimetype="image/svg+xml",
-            headers={"Cache-Control": "no-cache, max-age=0"},
+            # Cache at Vercel Edge for 24h (86400s), then serve stale while fetching fresh data
+            headers={"Cache-Control": "public, max-age=14400, s-maxage=86400, stale-while-revalidate=86400"},
         )
 
     except Exception as exc:  # noqa: BLE001
