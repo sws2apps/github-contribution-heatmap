@@ -135,18 +135,25 @@ def render_map_only(country_counts, theme='light'):
             .card { fill: #0f172a; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #f8fafc; }
             .badge-bg { fill: #3b82f6; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
             .divider { stroke: #334155; stroke-width: 1; }
             .country-fill { stroke: none; }
             .country-outline { fill: none; stroke: #334155; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
+            .badge-tiny { display: none; }
             
             @media (max-width: 600px) {
                 .title { font-size: 32px; }
                 .badge-desktop { display: none; }
                 .badge-mobile { display: block; }
+            }
+            @media (max-width: 367px) {
+                .title { font-size: 42px; }
+                .badge-mobile { display: none; }
+                .badge-tiny { display: block; }
             }
         """
     else:
@@ -157,18 +164,25 @@ def render_map_only(country_counts, theme='light'):
             .card { fill: #f1f5f9; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #0f172a; }
             .badge-bg { fill: #bfdbfe; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
             .divider { stroke: #cbd5e1; stroke-width: 1; }
             .country-fill { stroke: none; }
             .country-outline { fill: none; stroke: #334155; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
+            .badge-tiny { display: none; }
             
             @media (max-width: 600px) {
                 .title { font-size: 32px; }
                 .badge-desktop { display: none; }
                 .badge-mobile { display: block; }
+            }
+            @media (max-width: 367px) {
+                .title { font-size: 42px; }
+                .badge-mobile { display: none; }
+                .badge-tiny { display: block; }
             }
         """
 
@@ -178,12 +192,12 @@ def render_map_only(country_counts, theme='light'):
     # Singular/plural logic for badge text
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
     
-    # Desktop badge (normal size)
+    # Desktop badge (normal size, >600px)
     text_length = len(badge_val)
-    badge_w_desktop = max(130, text_length * 10)
-    badge_h_desktop = 22
+    badge_w_desktop = max(150, text_length * 12)
+    badge_h_desktop = 24
     badge_x_desktop = card_w - badge_w_desktop - 40
-    badge_y_desktop = 43
+    badge_y_desktop = 42
     
     desktop_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-desktop"})
     etree.SubElement(desktop_group, "rect", x=str(badge_x_desktop), y=str(badge_y_desktop), 
@@ -193,11 +207,11 @@ def render_map_only(country_counts, theme='light'):
                      y=str(badge_y_desktop + badge_h_desktop/2 + 1), 
                      attrib={"class": "badge-text"}).text = badge_val
     
-    # Mobile badge (larger size)
-    badge_w_mobile = max(220, text_length * 18)  # Larger for mobile
-    badge_h_mobile = 36  # Taller for mobile
+    # Mobile badge (367-600px)
+    badge_w_mobile = max(240, text_length * 20)
+    badge_h_mobile = 38
     badge_x_mobile = card_w - badge_w_mobile - 40
-    badge_y_mobile = 36
+    badge_y_mobile = 35
     
     mobile_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-mobile"})
     etree.SubElement(mobile_group, "rect", x=str(badge_x_mobile), y=str(badge_y_mobile), 
@@ -206,6 +220,20 @@ def render_map_only(country_counts, theme='light'):
     etree.SubElement(mobile_group, "text", x=str(badge_x_mobile + badge_w_mobile/2), 
                      y=str(badge_y_mobile + badge_h_mobile/2 + 1), 
                      attrib={"class": "badge-text-mobile"}).text = badge_val
+    
+    # Tiny badge (<367px) — extra wide to prevent text overflow
+    badge_w_tiny = max(320, text_length * 26)
+    badge_h_tiny = 48
+    badge_x_tiny = card_w - badge_w_tiny - 40
+    badge_y_tiny = 30
+    
+    tiny_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-tiny"})
+    etree.SubElement(tiny_group, "rect", x=str(badge_x_tiny), y=str(badge_y_tiny), 
+                     width=str(badge_w_tiny), height=str(badge_h_tiny), 
+                     rx=str(badge_h_tiny/2), attrib={"class": "badge-bg"})
+    etree.SubElement(tiny_group, "text", x=str(badge_x_tiny + badge_w_tiny/2), 
+                     y=str(badge_y_tiny + badge_h_tiny/2 + 1), 
+                     attrib={"class": "badge-text-tiny"}).text = badge_val
     
     etree.SubElement(final_svg, "line", x1="40", y1="90", x2=str(card_w-40), y2="90", attrib={"class": "divider"})
 
@@ -267,8 +295,9 @@ def render_map_with_list(country_counts, theme='light'):
             .card { fill: #0f172a; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #f8fafc; }
             .badge-bg { fill: #3b82f6; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
             .divider { stroke: #334155; stroke-width: 1; }
             .country-fill { stroke: none; }
             .country-outline { fill: none; stroke: #334155; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
@@ -278,6 +307,7 @@ def render_map_with_list(country_counts, theme='light'):
             .list-divider { stroke: #334155; stroke-width: 1; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
+            .badge-tiny { display: none; }
             
             @media (max-width: 600px) {
                 .title { font-size: 40px; }
@@ -285,6 +315,13 @@ def render_map_with_list(country_counts, theme='light'):
                 .badge-mobile { display: block; }
                 .list-title { font-size: 24px; }
                 .country-name, .country-count { font-size: 24px; }
+            }
+            @media (max-width: 367px) {
+                .title { font-size: 50px; }
+                .badge-mobile { display: none; }
+                .badge-tiny { display: block; }
+                .list-title { font-size: 30px; }
+                .country-name, .country-count { font-size: 30px; }
             }
         """
     else:
@@ -295,8 +332,9 @@ def render_map_with_list(country_counts, theme='light'):
             .card { fill: #f1f5f9; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #0f172a; }
             .badge-bg { fill: #bfdbfe; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
+            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
             .divider { stroke: #cbd5e1; stroke-width: 1; }
             .country-fill { stroke: none; }
             .country-outline { fill: none; stroke: #334155; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
@@ -306,6 +344,7 @@ def render_map_with_list(country_counts, theme='light'):
             .list-divider { stroke: #cbd5e1; stroke-width: 1; }
             .badge-desktop { display: block; }
             .badge-mobile { display: none; }
+            .badge-tiny { display: none; }
 
             @media (max-width: 600px) {
                 .title { font-size: 40px; }
@@ -313,6 +352,13 @@ def render_map_with_list(country_counts, theme='light'):
                 .badge-mobile { display: block; }
                 .list-title { font-size: 24px; }
                 .country-name, .country-count { font-size: 24px; }
+            }
+            @media (max-width: 367px) {
+                .title { font-size: 50px; }
+                .badge-mobile { display: none; }
+                .badge-tiny { display: block; }
+                .list-title { font-size: 30px; }
+                .country-name, .country-count { font-size: 30px; }
             }
         """
 
@@ -323,12 +369,12 @@ def render_map_with_list(country_counts, theme='light'):
     # Singular/plural logic for badge text
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
     
-    # Desktop badge (normal size)
+    # Desktop badge (normal size, >600px)
     text_length = len(badge_val)
-    badge_w_desktop = max(165, text_length * 12.5)
-    badge_h_desktop = 26
+    badge_w_desktop = max(180, text_length * 14)
+    badge_h_desktop = 28
     badge_x_desktop = map_area_w - badge_w_desktop
-    badge_y_desktop = 41
+    badge_y_desktop = 40
     
     desktop_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-desktop"})
     etree.SubElement(desktop_group, "rect", x=str(badge_x_desktop), y=str(badge_y_desktop), 
@@ -338,11 +384,11 @@ def render_map_with_list(country_counts, theme='light'):
                      y=str(badge_y_desktop + badge_h_desktop/2 + 1), 
                      attrib={"class": "badge-text"}).text = badge_val
     
-    # Mobile badge (larger size)
-    badge_w_mobile = max(280, text_length * 22)  # Larger for mobile
-    badge_h_mobile = 44  # Taller for mobile
+    # Mobile badge (367-600px)
+    badge_w_mobile = max(300, text_length * 24)
+    badge_h_mobile = 46
     badge_x_mobile = map_area_w - badge_w_mobile
-    badge_y_mobile = 34
+    badge_y_mobile = 32
     
     mobile_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-mobile"})
     etree.SubElement(mobile_group, "rect", x=str(badge_x_mobile), y=str(badge_y_mobile), 
@@ -351,6 +397,20 @@ def render_map_with_list(country_counts, theme='light'):
     etree.SubElement(mobile_group, "text", x=str(badge_x_mobile + badge_w_mobile/2), 
                      y=str(badge_y_mobile + badge_h_mobile/2 + 1), 
                      attrib={"class": "badge-text-mobile"}).text = badge_val
+    
+    # Tiny badge (<367px) — extra wide to prevent text overflow
+    badge_w_tiny = max(400, text_length * 30)
+    badge_h_tiny = 56
+    badge_x_tiny = map_area_w - badge_w_tiny
+    badge_y_tiny = 27
+    
+    tiny_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-tiny"})
+    etree.SubElement(tiny_group, "rect", x=str(badge_x_tiny), y=str(badge_y_tiny), 
+                     width=str(badge_w_tiny), height=str(badge_h_tiny), 
+                     rx=str(badge_h_tiny/2), attrib={"class": "badge-bg"})
+    etree.SubElement(tiny_group, "text", x=str(badge_x_tiny + badge_w_tiny/2), 
+                     y=str(badge_y_tiny + badge_h_tiny/2 + 1), 
+                     attrib={"class": "badge-text-tiny"}).text = badge_val
     
     etree.SubElement(final_svg, "line", x1="40", y1="90", x2=str(map_area_w), y2="90", attrib={"class": "divider"})
 
