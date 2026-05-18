@@ -130,8 +130,9 @@ def render_map_only(country_counts, theme='light'):
     total_countries = len(country_counts)
     is_dark = theme == 'dark'
 
+    # Map ratio is roughly 2:1. To avoid empty vertical space, card_h is adjusted.
     card_w = 920
-    card_h = 620
+    card_h = 560
     
     final_svg = etree.Element("svg",
         width="100%",
@@ -231,9 +232,11 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     total_countries = len(country_counts)
     is_dark = theme == "dark"
 
+    # Map ratio is ~2:1. Adjusting card_h and map_area_w maximizes area coverage
+    # and eliminates empty space on the sides and bottom.
     card_w = 1200
-    card_h = 620
-    map_area_w = 720
+    card_h = 510
+    map_area_w = 780
     list_area_x = map_area_w + 40
     
     final_svg = etree.Element("svg",
