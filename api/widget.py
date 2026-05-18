@@ -131,6 +131,7 @@ def render_map_only(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
+            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
             .card { fill: #0f172a; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #f8fafc; }
             .badge-bg { fill: #3b82f6; }
@@ -152,6 +153,7 @@ def render_map_only(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
+            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
             .card { fill: #f1f5f9; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #0f172a; }
             .badge-bg { fill: #bfdbfe; }
@@ -178,7 +180,7 @@ def render_map_only(country_counts, theme='light'):
     
     # Desktop badge (normal size)
     text_length = len(badge_val)
-    badge_w_desktop = max(120, text_length * 8.5)
+    badge_w_desktop = max(130, text_length * 10)
     badge_h_desktop = 22
     badge_x_desktop = card_w - badge_w_desktop - 40
     badge_y_desktop = 43
@@ -192,7 +194,7 @@ def render_map_only(country_counts, theme='light'):
                      attrib={"class": "badge-text"}).text = badge_val
     
     # Mobile badge (larger size)
-    badge_w_mobile = max(200, text_length * 16)  # Larger for mobile
+    badge_w_mobile = max(220, text_length * 18)  # Larger for mobile
     badge_h_mobile = 36  # Taller for mobile
     badge_x_mobile = card_w - badge_w_mobile - 40
     badge_y_mobile = 36
@@ -261,6 +263,7 @@ def render_map_with_list(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
+            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
             .card { fill: #0f172a; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #f8fafc; }
             .badge-bg { fill: #3b82f6; }
@@ -288,6 +291,7 @@ def render_map_with_list(country_counts, theme='light'):
         style_elem = etree.SubElement(final_svg, "style")
         style_elem.text = """
             @import url('https://rsms.me/inter/inter.css');
+            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
             .card { fill: #f1f5f9; rx: 10; }
             .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #0f172a; }
             .badge-bg { fill: #bfdbfe; }
@@ -321,7 +325,7 @@ def render_map_with_list(country_counts, theme='light'):
     
     # Desktop badge (normal size)
     text_length = len(badge_val)
-    badge_w_desktop = max(145, text_length * 10)
+    badge_w_desktop = max(165, text_length * 12.5)
     badge_h_desktop = 26
     badge_x_desktop = map_area_w - badge_w_desktop
     badge_y_desktop = 41
@@ -335,7 +339,7 @@ def render_map_with_list(country_counts, theme='light'):
                      attrib={"class": "badge-text"}).text = badge_val
     
     # Mobile badge (larger size)
-    badge_w_mobile = max(260, text_length * 20)  # Larger for mobile
+    badge_w_mobile = max(280, text_length * 22)  # Larger for mobile
     badge_h_mobile = 44  # Taller for mobile
     badge_x_mobile = map_area_w - badge_w_mobile
     badge_y_mobile = 34
