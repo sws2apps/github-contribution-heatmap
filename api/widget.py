@@ -141,115 +141,59 @@ def render_map_only(country_counts, theme='light'):
         xmlns="http://www.w3.org/2000/svg"
     )
     
-    if is_dark:
-        style_elem = etree.SubElement(final_svg, "style")
-        style_elem.text = """
-            @import url('https://rsms.me/inter/inter.css');
-            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
-            .card { fill: #0f172a; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #f8fafc; }
-            .badge-bg { fill: #3b82f6; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #334155; stroke-width: 1; }
-            .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #334155; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
-            .badge-desktop { display: block; }
-            .badge-mobile { display: none; }
-            .badge-tiny { display: none; }
-            
-            @media (max-width: 600px) {
-                .title { font-size: 32px; }
-                .badge-desktop { display: none; }
-                .badge-mobile { display: block; }
-            }
-            @media (max-width: 367px) {
-                .title { font-size: 42px; }
-                .badge-mobile { display: none; }
-                .badge-tiny { display: block; }
-            }
-        """
-    else:
-        style_elem = etree.SubElement(final_svg, "style")
-        style_elem.text = """
-            @import url('https://rsms.me/inter/inter.css');
-            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
-            .card { fill: #f1f5f9; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #0f172a; }
-            .badge-bg { fill: #bfdbfe; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #cbd5e1; stroke-width: 1; }
-            .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #334155; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
-            .badge-desktop { display: block; }
-            .badge-mobile { display: none; }
-            .badge-tiny { display: none; }
-            
-            @media (max-width: 600px) {
-                .title { font-size: 32px; }
-                .badge-desktop { display: none; }
-                .badge-mobile { display: block; }
-            }
-            @media (max-width: 367px) {
-                .title { font-size: 42px; }
-                .badge-mobile { display: none; }
-                .badge-tiny { display: block; }
-            }
-        """
+    # --- CSS: single clean stylesheet, no media queries ---
+    # Font sizes are in viewBox units; the SVG scales uniformly so they stay
+    # proportional at every rendered width without any JS or media queries.
+    title_color  = "#f8fafc" if is_dark else "#0f172a"
+    card_color   = "#0f172a" if is_dark else "#f1f5f9"
+    badge_bg     = "#3b82f6" if is_dark else "#bfdbfe"
+    badge_fg     = "#ffffff" if is_dark else "#1e40af"
+    divider_clr  = "#334155" if is_dark else "#cbd5e1"
+    outline_clr  = "#334155"
+    outline_op   = "1" if is_dark else "0.8"
 
-    etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="10", attrib={"class": "card"})
-    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contributors heatmap"
-    
-    # Singular/plural logic for badge text
+    style_elem = etree.SubElement(final_svg, "style")
+    style_elem.text = f"""
+        @import url('https://rsms.me/inter/inter.css');
+        svg, text {{ -webkit-text-size-adjust: none; text-size-adjust: none; }}
+        .card    {{ fill: {card_color}; }}
+        .title   {{ font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: {title_color}; }}
+        .badge-bg  {{ fill: {badge_bg}; }}
+        .badge-text {{ font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+                      fill: {badge_fg}; letter-spacing: 0.06em;
+                      text-anchor: middle; dominant-baseline: middle; }}
+        .divider {{ stroke: {divider_clr}; stroke-width: 1; }}
+        .country-fill    {{ stroke: none; }}
+        .country-outline {{ fill: none; stroke: {outline_clr}; stroke-width: 0.4;
+                           stroke-linejoin: round; pointer-events: none; opacity: {outline_op}; }}
+    """
+
+    etree.SubElement(final_svg, "rect", x="0", y="0",
+                     width=str(card_w), height=str(card_h), rx="10",
+                     attrib={"class": "card"})
+    etree.SubElement(final_svg, "text", x="40", y="60",
+                     attrib={"class": "title"}).text = "Contributors heatmap"
+
+    # Single badge — sized in viewBox units, always proportional
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
-    
-    # Desktop badge (normal size, >600px)
-    text_length = len(badge_val)
-    badge_w_desktop = max(150, text_length * 12)
-    badge_h_desktop = 24
-    badge_x_desktop = card_w - badge_w_desktop - 40
-    badge_y_desktop = 42
-    
-    desktop_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-desktop"})
-    etree.SubElement(desktop_group, "rect", x=str(badge_x_desktop), y=str(badge_y_desktop), 
-                     width=str(badge_w_desktop), height=str(badge_h_desktop), 
-                     rx=str(badge_h_desktop/2), attrib={"class": "badge-bg"})
-    etree.SubElement(desktop_group, "text", x=str(badge_x_desktop + badge_w_desktop/2), 
-                     y=str(badge_y_desktop + badge_h_desktop/2 + 1), 
+    text_len  = len(badge_val)
+    badge_h   = 28
+    badge_w   = max(160, text_len * 13)
+    badge_x   = card_w - badge_w - 40
+    badge_y   = 40
+    etree.SubElement(final_svg, "rect",
+                     x=str(badge_x), y=str(badge_y),
+                     width=str(badge_w), height=str(badge_h),
+                     rx=str(badge_h / 2),
+                     attrib={"class": "badge-bg"})
+    etree.SubElement(final_svg, "text",
+                     x=str(badge_x + badge_w / 2),
+                     y=str(badge_y + badge_h / 2 + 1),
                      attrib={"class": "badge-text"}).text = badge_val
-    
-    # Mobile badge (367-600px)
-    badge_w_mobile = max(240, text_length * 20)
-    badge_h_mobile = 38
-    badge_x_mobile = card_w - badge_w_mobile - 40
-    badge_y_mobile = 35
-    
-    mobile_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-mobile"})
-    etree.SubElement(mobile_group, "rect", x=str(badge_x_mobile), y=str(badge_y_mobile), 
-                     width=str(badge_w_mobile), height=str(badge_h_mobile), 
-                     rx=str(badge_h_mobile/2), attrib={"class": "badge-bg"})
-    etree.SubElement(mobile_group, "text", x=str(badge_x_mobile + badge_w_mobile/2), 
-                     y=str(badge_y_mobile + badge_h_mobile/2 + 1), 
-                     attrib={"class": "badge-text-mobile"}).text = badge_val
-    
-    # Tiny badge (<367px) — extra wide to prevent text overflow
-    badge_w_tiny = max(320, text_length * 26)
-    badge_h_tiny = 48
-    badge_x_tiny = card_w - badge_w_tiny - 40
-    badge_y_tiny = 30
-    
-    tiny_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-tiny"})
-    etree.SubElement(tiny_group, "rect", x=str(badge_x_tiny), y=str(badge_y_tiny), 
-                     width=str(badge_w_tiny), height=str(badge_h_tiny), 
-                     rx=str(badge_h_tiny/2), attrib={"class": "badge-bg"})
-    etree.SubElement(tiny_group, "text", x=str(badge_x_tiny + badge_w_tiny/2), 
-                     y=str(badge_y_tiny + badge_h_tiny/2 + 1), 
-                     attrib={"class": "badge-text-tiny"}).text = badge_val
-    
-    etree.SubElement(final_svg, "line", x1="40", y1="90", x2=str(card_w-40), y2="90", attrib={"class": "divider"})
+
+    etree.SubElement(final_svg, "line",
+                     x1="40", y1="90", x2=str(card_w - 40), y2="90",
+                     attrib={"class": "divider"})
 
     orig_root = load_map_svg()
     vb_str = orig_root.get("viewBox")
@@ -300,132 +244,64 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         xmlns="http://www.w3.org/2000/svg"
     )
     
-    if is_dark:
-        style_elem = etree.SubElement(final_svg, "style")
-        style_elem.text = """
-            @import url('https://rsms.me/inter/inter.css');
-            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
-            .card { fill: #0f172a; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #f8fafc; }
-            .badge-bg { fill: #3b82f6; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #ffffff; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #334155; stroke-width: 1; }
-            .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #334155; stroke-width: 0.5; stroke-linejoin: round; pointer-events: none; }
-            .list-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #94a3b8; }
-            .country-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: #f8fafc; }
-            .country-count { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: #60a5fa; }
-            .list-divider { stroke: #334155; stroke-width: 1; }
-            .badge-desktop { display: block; }
-            .badge-mobile { display: none; }
-            .badge-tiny { display: none; }
-            
-            @media (max-width: 600px) {
-                .title { font-size: 40px; }
-                .badge-desktop { display: none; }
-                .badge-mobile { display: block; }
-                .list-title { font-size: 24px; }
-                .country-name, .country-count { font-size: 24px; }
-            }
-            @media (max-width: 367px) {
-                .title { font-size: 50px; }
-                .badge-mobile { display: none; }
-                .badge-tiny { display: block; }
-                .list-title { font-size: 30px; }
-                .country-name, .country-count { font-size: 30px; }
-            }
-        """
-    else:
-        style_elem = etree.SubElement(final_svg, "style")
-        style_elem.text = """
-            @import url('https://rsms.me/inter/inter.css');
-            svg, text { -webkit-text-size-adjust: none; text-size-adjust: none; }
-            .card { fill: #f1f5f9; rx: 10; }
-            .title { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #0f172a; }
-            .badge-bg { fill: #bfdbfe; }
-            .badge-text { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-mobile { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .badge-text-tiny { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: #1e40af; letter-spacing: 0.05em; text-anchor: middle; dominant-baseline: middle; }
-            .divider { stroke: #cbd5e1; stroke-width: 1; }
-            .country-fill { stroke: none; }
-            .country-outline { fill: none; stroke: #334155; stroke-width: 0.4; stroke-linejoin: round; pointer-events: none; opacity: 0.8; }
-            .list-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: #64748b; }
-            .country-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: #334155; }
-            .country-count { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: #1e40af; }
-            .list-divider { stroke: #cbd5e1; stroke-width: 1; }
-            .badge-desktop { display: block; }
-            .badge-mobile { display: none; }
-            .badge-tiny { display: none; }
+    # --- CSS: single stylesheet, no media queries ---
+    title_color  = "#f8fafc" if is_dark else "#0f172a"
+    card_color   = "#0f172a" if is_dark else "#f1f5f9"
+    badge_bg     = "#3b82f6" if is_dark else "#bfdbfe"
+    badge_fg     = "#ffffff" if is_dark else "#1e40af"
+    divider_clr  = "#334155" if is_dark else "#cbd5e1"
+    list_lbl_clr = "#94a3b8" if is_dark else "#64748b"
+    cname_clr    = "#f8fafc" if is_dark else "#334155"
+    ccount_clr   = "#60a5fa" if is_dark else "#1e40af"
+    outline_clr  = "#334155"
+    outline_op   = "1" if is_dark else "0.8"
 
-            @media (max-width: 600px) {
-                .title { font-size: 40px; }
-                .badge-desktop { display: none; }
-                .badge-mobile { display: block; }
-                .list-title { font-size: 24px; }
-                .country-name, .country-count { font-size: 24px; }
-            }
-            @media (max-width: 367px) {
-                .title { font-size: 50px; }
-                .badge-mobile { display: none; }
-                .badge-tiny { display: block; }
-                .list-title { font-size: 30px; }
-                .country-name, .country-count { font-size: 30px; }
-            }
-        """
+    style_elem = etree.SubElement(final_svg, "style")
+    style_elem.text = f"""
+        @import url('https://rsms.me/inter/inter.css');
+        svg, text {{ -webkit-text-size-adjust: none; text-size-adjust: none; }}
+        .card         {{ fill: {card_color}; }}
+        .title        {{ font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: {title_color}; }}
+        .badge-bg     {{ fill: {badge_bg}; }}
+        .badge-text   {{ font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+                        fill: {badge_fg}; letter-spacing: 0.06em;
+                        text-anchor: middle; dominant-baseline: middle; }}
+        .divider      {{ stroke: {divider_clr}; stroke-width: 1; }}
+        .list-divider {{ stroke: {divider_clr}; stroke-width: 1; }}
+        .country-fill    {{ stroke: none; }}
+        .country-outline {{ fill: none; stroke: {outline_clr}; stroke-width: 0.4;
+                           stroke-linejoin: round; pointer-events: none; opacity: {outline_op}; }}
+        .list-title   {{ font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: {list_lbl_clr}; }}
+        .country-name {{ font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: {cname_clr}; }}
+        .country-count{{ font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: {ccount_clr}; }}
+    """
 
-    etree.SubElement(final_svg, "rect", x="0", y="0", width=str(card_w), height=str(card_h), rx="10", attrib={"class": "card"})
-    
-    # Header
-    etree.SubElement(final_svg, "text", x="40", y="60", attrib={"class": "title"}).text = "Contributors heatmap"
-    # Singular/plural logic for badge text
+    etree.SubElement(final_svg, "rect", x="0", y="0",
+                     width=str(card_w), height=str(card_h), rx="10",
+                     attrib={"class": "card"})
+    etree.SubElement(final_svg, "text", x="40", y="60",
+                     attrib={"class": "title"}).text = "Contributors heatmap"
+
+    # Single badge — sized in viewBox units, always proportional at any scale
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
-    
-    # Desktop badge (normal size, >600px)
-    text_length = len(badge_val)
-    badge_w_desktop = max(180, text_length * 14)
-    badge_h_desktop = 28
-    badge_x_desktop = map_area_w - badge_w_desktop
-    badge_y_desktop = 40
-    
-    desktop_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-desktop"})
-    etree.SubElement(desktop_group, "rect", x=str(badge_x_desktop), y=str(badge_y_desktop), 
-                     width=str(badge_w_desktop), height=str(badge_h_desktop), 
-                     rx=str(badge_h_desktop/2), attrib={"class": "badge-bg"})
-    etree.SubElement(desktop_group, "text", x=str(badge_x_desktop + badge_w_desktop/2), 
-                     y=str(badge_y_desktop + badge_h_desktop/2 + 1), 
+    text_len  = len(badge_val)
+    badge_h   = 28
+    badge_w   = max(180, text_len * 13)
+    badge_x   = map_area_w - badge_w
+    badge_y   = 40
+    etree.SubElement(final_svg, "rect",
+                     x=str(badge_x), y=str(badge_y),
+                     width=str(badge_w), height=str(badge_h),
+                     rx=str(badge_h / 2),
+                     attrib={"class": "badge-bg"})
+    etree.SubElement(final_svg, "text",
+                     x=str(badge_x + badge_w / 2),
+                     y=str(badge_y + badge_h / 2 + 1),
                      attrib={"class": "badge-text"}).text = badge_val
-    
-    # Mobile badge (367-600px)
-    badge_w_mobile = max(300, text_length * 24)
-    badge_h_mobile = 46
-    badge_x_mobile = map_area_w - badge_w_mobile
-    badge_y_mobile = 32
-    
-    mobile_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-mobile"})
-    etree.SubElement(mobile_group, "rect", x=str(badge_x_mobile), y=str(badge_y_mobile), 
-                     width=str(badge_w_mobile), height=str(badge_h_mobile), 
-                     rx=str(badge_h_mobile/2), attrib={"class": "badge-bg"})
-    etree.SubElement(mobile_group, "text", x=str(badge_x_mobile + badge_w_mobile/2), 
-                     y=str(badge_y_mobile + badge_h_mobile/2 + 1), 
-                     attrib={"class": "badge-text-mobile"}).text = badge_val
-    
-    # Tiny badge (<367px) — extra wide to prevent text overflow
-    badge_w_tiny = max(400, text_length * 30)
-    badge_h_tiny = 56
-    badge_x_tiny = map_area_w - badge_w_tiny
-    badge_y_tiny = 27
-    
-    tiny_group = etree.SubElement(final_svg, "g", attrib={"class": "badge-tiny"})
-    etree.SubElement(tiny_group, "rect", x=str(badge_x_tiny), y=str(badge_y_tiny), 
-                     width=str(badge_w_tiny), height=str(badge_h_tiny), 
-                     rx=str(badge_h_tiny/2), attrib={"class": "badge-bg"})
-    etree.SubElement(tiny_group, "text", x=str(badge_x_tiny + badge_w_tiny/2), 
-                     y=str(badge_y_tiny + badge_h_tiny/2 + 1), 
-                     attrib={"class": "badge-text-tiny"}).text = badge_val
-    
-    etree.SubElement(final_svg, "line", x1="40", y1="90", x2=str(map_area_w), y2="90", attrib={"class": "divider"})
+
+    etree.SubElement(final_svg, "line",
+                     x1="40", y1="90", x2=str(map_area_w), y2="90",
+                     attrib={"class": "divider"})
 
     # Vertical divider between map and list
     etree.SubElement(final_svg, "line", x1=str(map_area_w + 20), y1="40", x2=str(map_area_w + 20), y2=str(card_h - 40), attrib={"class": "list-divider"})
