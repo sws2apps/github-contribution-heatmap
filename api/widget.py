@@ -256,6 +256,7 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     outline_clr  = "#334155"
     outline_op   = "1" if is_dark else "0.8"
 
+    style_elem = etree.SubElement(final_svg, "style")
     style_elem.text = f"""
         @import url('https://rsms.me/inter/inter.css');
         svg, text {{ -webkit-text-size-adjust: none; text-size-adjust: none; }}
