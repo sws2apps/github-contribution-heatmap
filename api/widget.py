@@ -130,9 +130,9 @@ def render_map_only(country_counts, theme='light'):
     total_countries = len(country_counts)
     is_dark = theme == 'dark'
 
-    # Map ratio is exactly 1.998. Mathematically optimal card_h for 920 card_w is 570.
+    # Compact height; map margins tightened so map stays large.
     card_w = 920
-    card_h = 570
+    card_h = 480
     
     final_svg = etree.Element("svg",
         width="100%",
@@ -167,6 +167,10 @@ def render_map_only(country_counts, theme='light'):
         .country-fill    {{ stroke: none; }}
         .country-outline {{ fill: none; stroke: {outline_clr}; stroke-width: 0.4;
                            stroke-linejoin: round; pointer-events: none; opacity: {outline_op}; }}
+        @media (min-width: 600px) {{
+            .title      {{ font-size: 24px; }}
+            .badge-text {{ font-size: 14px; }}
+        }}
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0",
@@ -207,10 +211,10 @@ def render_map_only(country_counts, theme='light'):
         ox, oy, ow, oh = 0, 0, 1000, 500
 
     target_w = card_w - 80
-    target_h = card_h - 150
+    target_h = card_h - 110
     scale = min(target_w / ow, target_h / oh)
     tx = 40 + (target_w - ow * scale) / 2 - ox * scale
-    ty = 130 + (target_h - oh * scale) / 2 - oy * scale
+    ty = 100 + (target_h - oh * scale) / 2 - oy * scale
 
     color_fn = get_color_dark if is_dark else get_color
     empty_fill = '#1e293b' if is_dark else '#ffffff'
@@ -232,10 +236,10 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     total_countries = len(country_counts)
     is_dark = theme == "dark"
 
-    # Map ratio is 1.998. Adjusting card_h to 520 and map_area_w to 820 maximizes map area.
+    # Give more width to the list side by reducing the map area.
     card_w = 1200
     card_h = 520
-    map_area_w = 820
+    map_area_w = 700
     list_area_x = map_area_w + 40
     
     final_svg = etree.Element("svg",
@@ -276,6 +280,13 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         .list-title   {{ font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: {list_lbl_clr}; }}
         .country-name {{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 500; fill: {cname_clr}; }}
         .country-count{{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; fill: {ccount_clr}; }}
+        @media (min-width: 600px) {{
+            .title        {{ font-size: 25px; }}
+            .badge-text   {{ font-size: 14px; }}
+            .list-title   {{ font-size: 20px; }}
+            .country-name {{ font-size: 18px; }}
+            .country-count{{ font-size: 18px; }}
+        }}
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0",
@@ -438,9 +449,9 @@ def heatmap() -> Response:
         return Response(
             svg_output,
             mimetype="image/svg+xml",
-            # max-age=0: no browser caching. s-maxage=86400: Vercel edge caches for 24h.
-            # stale-while-revalidate: serve stale instantly while background refresh runs.
-            headers={"Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400"},
+            # max-age=0: no browser cache. s-maxage=0: force Vercel edge to always regenerate.
+            # Re-enable s-maxage=86400 once stale cache issue is confirmed resolved.
+            headers={"Cache-Control": "public, max-age=0, s-maxage=0"},
         )
 
     except Exception as exc:  # noqa: BLE001
