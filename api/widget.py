@@ -157,9 +157,9 @@ def render_map_only(country_counts, theme='light'):
         @import url('https://rsms.me/inter/inter.css');
         svg, text {{ -webkit-text-size-adjust: none; text-size-adjust: none; }}
         .card    {{ fill: {card_color}; }}
-        .title   {{ font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 600; fill: {title_color}; }}
+        .title   {{ font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 600; fill: {title_color}; }}
         .badge-bg  {{ fill: {badge_bg}; }}
-        .badge-text {{ font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+        .badge-text {{ font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700;
                       fill: {badge_fg}; letter-spacing: 0.06em;
                       text-anchor: middle; dominant-baseline: middle; }}
         .divider {{ stroke: {divider_clr}; stroke-width: 1; }}
@@ -177,10 +177,10 @@ def render_map_only(country_counts, theme='light'):
     # Single badge — sized in viewBox units, always proportional
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
     text_len  = len(badge_val)
-    badge_h   = 28
-    badge_w   = max(160, text_len * 13)
+    badge_h   = 36
+    badge_w   = max(190, text_len * 16)
     badge_x   = card_w - badge_w - 40
-    badge_y   = 40
+    badge_y   = 34
     etree.SubElement(final_svg, "rect",
                      x=str(badge_x), y=str(badge_y),
                      width=str(badge_w), height=str(badge_h),
@@ -256,14 +256,13 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     outline_clr  = "#334155"
     outline_op   = "1" if is_dark else "0.8"
 
-    style_elem = etree.SubElement(final_svg, "style")
     style_elem.text = f"""
         @import url('https://rsms.me/inter/inter.css');
         svg, text {{ -webkit-text-size-adjust: none; text-size-adjust: none; }}
         .card         {{ fill: {card_color}; }}
-        .title        {{ font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; fill: {title_color}; }}
+        .title        {{ font-family: 'Inter', sans-serif; font-size: 34px; font-weight: 600; fill: {title_color}; }}
         .badge-bg     {{ fill: {badge_bg}; }}
-        .badge-text   {{ font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+        .badge-text   {{ font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700;
                         fill: {badge_fg}; letter-spacing: 0.06em;
                         text-anchor: middle; dominant-baseline: middle; }}
         .divider      {{ stroke: {divider_clr}; stroke-width: 1; }}
@@ -271,9 +270,9 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         .country-fill    {{ stroke: none; }}
         .country-outline {{ fill: none; stroke: {outline_clr}; stroke-width: 0.4;
                            stroke-linejoin: round; pointer-events: none; opacity: {outline_op}; }}
-        .list-title   {{ font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; fill: {list_lbl_clr}; }}
-        .country-name {{ font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; fill: {cname_clr}; }}
-        .country-count{{ font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; fill: {ccount_clr}; }}
+        .list-title   {{ font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: {list_lbl_clr}; }}
+        .country-name {{ font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; fill: {cname_clr}; }}
+        .country-count{{ font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 700; fill: {ccount_clr}; }}
     """
 
     etree.SubElement(final_svg, "rect", x="0", y="0",
@@ -285,10 +284,10 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     # Single badge — sized in viewBox units, always proportional at any scale
     badge_val = f"{total_countries} COUNTRY" if total_countries == 1 else f"{total_countries} COUNTRIES"
     text_len  = len(badge_val)
-    badge_h   = 28
-    badge_w   = max(180, text_len * 13)
+    badge_h   = 36
+    badge_w   = max(210, text_len * 16)
     badge_x   = map_area_w - badge_w
-    badge_y   = 40
+    badge_y   = 34
     etree.SubElement(final_svg, "rect",
                      x=str(badge_x), y=str(badge_y),
                      width=str(badge_w), height=str(badge_h),
@@ -375,10 +374,10 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
             attrib={"class": "country-count", "text-anchor": "end"}).text = str(count)
         
         bar_width = (count / max_count) * bar_max_width
-        bar_x = count_x - 28 - bar_width
+        bar_x = count_x - 32 - bar_width
         etree.SubElement(final_svg, "rect", 
-            x=str(bar_x), y=str(y - 12), 
-            width=str(bar_width), height="18",
+            x=str(bar_x), y=str(y - 14), 
+            width=str(bar_width), height="22",
             rx="4",
             fill=color_fn(count, max_count),
             attrib={"class": "country-bar"})
