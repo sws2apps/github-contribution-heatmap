@@ -1,15 +1,29 @@
 """
-Embeddable Heatmap Widget
-This module contains the production widget endpoint.
+widget.py — SVG heatmap widget renderer.
+
+Exposes a single Flask Blueprint (`widget_bp`) with the `/api/heatmap` route.
+Two render variants are supported:
+  - render_map_only        compact world-map card
+  - render_map_with_list   map + top-countries leaderboard sidebar
 """
-from flask import Blueprint, request, Response
-import os
+
+import logging
 import math
+import os
+
+from flask import Blueprint, request, Response
 from lxml import etree
+
 from utils import get_all_contributors, resolve_country_code
 from data import COUNTRY_NAMES
 
-widget_bp = Blueprint('widget', __name__)
+logger = logging.getLogger(__name__)
+
+widget_bp = Blueprint("widget", __name__)
+
+# Allowed query-parameter values (reject anything outside these)
+_VALID_THEMES = {"light", "dark"}
+_VALID_VARIANTS = {"map", "list"}
 
 def get_color(count, max_count):
     """Returns an interpolated blue shade from light to dark blue."""
@@ -267,12 +281,11 @@ def render_map_only(country_counts, theme='light'):
     return etree.tostring(final_svg, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
-def render_map_with_list(country_counts, theme='light'):
+def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     """Render map with country list variant."""
     max_count = max(country_counts.values()) if country_counts else 1
     total_countries = len(country_counts)
-    total_contributors = sum(country_counts.values())
-    is_dark = theme == 'dark'
+    is_dark = theme == "dark"
 
     card_w = 1200
     card_h = 620
@@ -503,37 +516,53 @@ def render_map_with_list(country_counts, theme='light'):
     return etree.tostring(final_svg, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
-@widget_bp.route('/api/heatmap')
-def heatmap():
+@widget_bp.route("/api/heatmap")
+def heatmap() -> Response:
     """
-    Embeddable heatmap widget endpoint.
-    
-    Query params:
-        repo: GitHub repo (owner/name)
-        variant: 'list' (default) or 'map'
-        theme: 'light' (default) or 'dark'
-        refresh: '1' to force refresh cache
+    Render and return an SVG heatmap for a GitHub repository.
+
+    Query parameters
+    ----------------
+    repo     : str  – GitHub repository slug (``owner/name``). Required.
+    variant  : str  – ``list`` (default) or ``map``.
+    theme    : str  – ``light`` (default) or ``dark``.
+    refresh  : str  – Pass ``1`` to bypass the 24-hour cache.
     """
-    repo = request.args.get('repo', 'sws2apps/organized-app')
-    variant = request.args.get('variant', 'list')
-    theme = request.args.get('theme', 'light')
-    force_refresh = request.args.get('refresh') == '1'
-    
+    repo = request.args.get("repo", "").strip()
+    variant = request.args.get("variant", "list").strip().lower()
+    theme = request.args.get("theme", "light").strip().lower()
+    force_refresh = request.args.get("refresh") == "1"
+
+    # --- Input validation ---
+    if not repo:
+        return Response("Missing required parameter: repo", status=400)
+    if "/" not in repo or len(repo.split("/")) != 2:
+        return Response("Invalid repo format. Expected: owner/name", status=400)
+    if variant not in _VALID_VARIANTS:
+        variant = "list"
+    if theme not in _VALID_THEMES:
+        theme = "light"
+
     try:
         contributors = get_all_contributors(repo, force_refresh=force_refresh)
-        
-        country_counts = {}
+
+        country_counts: dict[str, int] = {}
         for user in contributors:
-            code = resolve_country_code(user['location'])
+            code = resolve_country_code(user["location"])
             if code:
                 country_counts[code] = country_counts.get(code, 0) + 1
-        
-        if variant == 'list':
+
+        if variant == "list":
             svg_output = render_map_with_list(country_counts, theme)
         else:
             svg_output = render_map_only(country_counts, theme)
-            
-        return Response(svg_output, mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache, max-age=0'})
 
-    except Exception as e:
-        return Response(f"Internal Error: {e}", status=500)
+        return Response(
+            svg_output,
+            mimetype="image/svg+xml",
+            headers={"Cache-Control": "no-cache, max-age=0"},
+        )
+
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Unhandled error rendering heatmap for %s", repo)
+        return Response(f"Internal server error: {exc}", status=500)

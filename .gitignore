@@ -8,7 +8,7 @@ venv/
 .venv/
 env/
 
-# Cache files
+# Cache files (auto-generated at runtime)
 repo_cache.json
 user_locations.json
 
@@ -26,3 +26,6 @@ Thumbs.db
 # Local development
 .env
 .env.local
+
+# Dev/test artifacts
+test_*.html

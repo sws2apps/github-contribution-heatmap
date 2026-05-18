@@ -1,39 +1,66 @@
+"""
+utils.py — GitHub contributor fetching and location resolution.
+
+Handles:
+  - GitHub API pagination for contributor lists
+  - Disk-backed caching (24-hour TTL) for API responses
+  - Fuzzy location → ISO-3166-1 alpha-2 country code resolution
+"""
+
 import os
 import json
 import time
+import logging
 import requests
 import pycountry
 
+logger = logging.getLogger(__name__)
+
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
-# Use /tmp for caching on Vercel (only writable directory)
+# Use /tmp for caching on Vercel (the only writable directory in serverless)
 CACHE_DIR = "/tmp" if os.getenv("VERCEL") else "."
 CACHE_FILE = os.path.join(CACHE_DIR, "repo_cache.json")
 LOCATION_CACHE_FILE = os.path.join(CACHE_DIR, "user_locations.json")
 
-def load_json(filename):
+CACHE_TTL_SECONDS = 86_400  # 24 hours
+
+
+# ---------------------------------------------------------------------------
+# Disk-backed JSON helpers
+# ---------------------------------------------------------------------------
+
+def load_json(filename: str) -> dict:
+    """Load a JSON file from disk, returning an empty dict on any failure."""
     if os.path.exists(filename):
         try:
-            with open(filename, "r") as f:
+            with open(filename, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"Error loading {filename}: {e}")
-            return {}
+        except Exception:
+            logger.warning("Could not load %s — starting fresh.", filename)
     return {}
 
-def save_json(filename, data):
+
+def save_json(filename: str, data: dict) -> None:
+    """Persist *data* as JSON to *filename*, silently failing in read-only envs."""
     try:
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(data, f)
-    except Exception as e:
-        # Fail silently in read-only environments
-        print(f"Warning: Could not save {filename}: {e}")
+    except Exception:
+        logger.warning("Could not save %s (read-only filesystem?).", filename)
 
-repo_cache = load_json(CACHE_FILE)
-user_locations = load_json(LOCATION_CACHE_FILE)
 
-# Comprehensive mapping of location strings to ISO country codes.
-# Sorted by length (descending) to prioritize more specific matches.
+# Module-level cache loaded once per cold-start
+repo_cache: dict = load_json(CACHE_FILE)
+user_locations: dict = load_json(LOCATION_CACHE_FILE)
+
+
+# ---------------------------------------------------------------------------
+# Location → country code resolution
+# ---------------------------------------------------------------------------
+
+# Comprehensive mapping of location strings to ISO 3166-1 alpha-2 codes.
+# Sorted longest-first so substring matching favours the most specific entry.
 COUNTRY_MAP = sorted([
     # NORTH AMERICA
     ("united states", "us"), ("usa", "us"), ("united states of america", "us"), ("washington d.c.", "us"),
@@ -119,107 +146,139 @@ COUNTRY_MAP = sorted([
     ("fiji", "fj"), ("suva", "fj"), ("papua new guinea", "pg"), ("port moresby", "pg"),
 ], key=lambda x: len(x[0]), reverse=True)
 
-LOCATION_BLOCKLIST = {"ci", "cd", "api", "bot", "n/a", "none", "unknown", "earth", "world", "internet", "remote"}
+# Values that should never be resolved (noise / placeholder text)
+LOCATION_BLOCKLIST = {
+    "ci", "cd", "api", "bot", "n/a", "none", "unknown",
+    "earth", "world", "internet", "remote",
+}
 
-def resolve_country_code(location):
-    if not location: return None
+
+def resolve_country_code(location: str | None) -> str | None:
+    """
+    Map a free-text location string to an ISO 3166-1 alpha-2 country code.
+
+    Resolution order:
+      1. Exact match in COUNTRY_MAP
+      2. Substring match in COUNTRY_MAP  (e.g. "Espoo region, Finland" → "fi")
+      3. Token-by-token check from end of string (country usually comes last)
+      4. pycountry fuzzy search on full string as fallback
+
+    Returns *None* if the location cannot be resolved or is in BLOCKLIST.
+    """
+    if not location:
+        return None
+
     loc_lower = location.lower().strip()
-    
-    # Skip blocklisted values
+
     if loc_lower in LOCATION_BLOCKLIST:
         return None
-    
-    # 1. Direct match in COUNTRY_MAP
+
+    # 1. Exact match
     for key, code in COUNTRY_MAP:
         if key == loc_lower:
             return code
 
-    # 2. Substring match in COUNTRY_MAP (e.g. "Espoo region, Finland")
+    # 2. Substring match
     for key, code in COUNTRY_MAP:
         if key in loc_lower:
             return code
 
-    # 3. Split by common separators and check parts
-    parts = [p.strip() for p in loc_lower.replace(",", " ").split() if p.strip()]
-    
-    # Check parts from end to beginning (usually Country is at the end)
-    for part in reversed(parts):
-        # Exact match for part in COUNTRY_MAP
+    # 3. Token-by-token (reversed — country typically at the end)
+    tokens = [p.strip() for p in loc_lower.replace(",", " ").split() if p.strip()]
+    for token in reversed(tokens):
         for key, code in COUNTRY_MAP:
-            if key == part:
+            if key == token:
                 return code
-        
-        # Try pycountry on this part
         try:
-            results = pycountry.countries.search_fuzzy(part)
+            results = pycountry.countries.search_fuzzy(token)
             if results:
                 return results[0].alpha_2.lower()
-        except:
+        except LookupError:
             pass
 
-    # 4. Fallback search on full string
+    # 4. Full-string pycountry fallback
     try:
         results = pycountry.countries.search_fuzzy(location)
         if results:
             return results[0].alpha_2.lower()
-    except:
+    except LookupError:
         for country in pycountry.countries:
             if country.name.lower() in loc_lower:
                 return country.alpha_2.lower()
-    
+
     return None
 
-def get_all_contributors(repo_name, force_refresh=False):
-    """Fetch all contributors by paginating through GitHub API."""
+
+# ---------------------------------------------------------------------------
+# GitHub API
+# ---------------------------------------------------------------------------
+
+def get_all_contributors(repo_name: str, force_refresh: bool = False) -> list[dict]:
+    """
+    Fetch all contributors for *repo_name*, including their profile locations.
+
+    Results are cached to disk for CACHE_TTL_SECONDS (24 h). Pass
+    ``force_refresh=True`` to bypass the cache and re-fetch from GitHub.
+
+    Each returned dict has keys: ``login`` (str), ``location`` (str | None).
+    """
     now = time.time()
-    
-    if not force_refresh and repo_name in repo_cache and now - repo_cache[repo_name]["timestamp"] < 86400:
+
+    if (
+        not force_refresh
+        and repo_name in repo_cache
+        and now - repo_cache[repo_name]["timestamp"] < CACHE_TTL_SECONDS
+    ):
         return repo_cache[repo_name]["data"]
 
     headers = {"Accept": "application/vnd.github+json"}
     if GITHUB_TOKEN:
         headers["Authorization"] = f"token {GITHUB_TOKEN}"
 
-    contributors = []
+    # --- Paginate contributors endpoint ---
+    contributors: list[dict] = []
     page = 1
     while True:
-        url = f"https://api.github.com/repos/{repo_name}/contributors?per_page=100&page={page}"
+        url = (
+            f"https://api.github.com/repos/{repo_name}/contributors"
+            f"?per_page=100&page={page}"
+        )
         try:
             resp = requests.get(url, headers=headers, timeout=10)
             if resp.status_code != 200:
+                logger.warning("GitHub contributors API returned %s for %s", resp.status_code, repo_name)
                 break
-            data = resp.json()
-            if not data:
+            page_data = resp.json()
+            if not page_data:
                 break
-            contributors.extend(data)
-            if len(data) < 100:
+            contributors.extend(page_data)
+            if len(page_data) < 100:
                 break
             page += 1
-        except Exception as e:
-            print(f"Error fetching contributors: {e}")
+        except requests.RequestException as exc:
+            logger.error("Error fetching contributors page %s: %s", page, exc)
             break
 
-    users_data = []
-    for c in contributors:
-        username = c['login'].lower()
+    # --- Resolve locations (with per-user cache) ---
+    users_data: list[dict] = []
+    for contributor in contributors:
+        username = contributor["login"].lower()
         if username in user_locations:
             location = user_locations[username]
         else:
+            location = None
             try:
-                u_resp = requests.get(c['url'], headers=headers, timeout=10)
-                location = None
+                u_resp = requests.get(contributor["url"], headers=headers, timeout=10)
                 if u_resp.status_code == 200:
                     location = u_resp.json().get("location")
-                    user_locations[username] = location
-                else:
-                    user_locations[username] = None
-            except:
-                user_locations[username] = None
-        
+            except requests.RequestException as exc:
+                logger.warning("Could not fetch profile for %s: %s", username, exc)
+            user_locations[username] = location
+
         users_data.append({"login": username, "location": location})
 
     save_json(LOCATION_CACHE_FILE, user_locations)
     repo_cache[repo_name] = {"timestamp": now, "data": users_data}
     save_json(CACHE_FILE, repo_cache)
-    
+
     return users_data
