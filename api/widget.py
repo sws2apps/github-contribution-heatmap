@@ -256,7 +256,7 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
 
     # Give more width to the list side by reducing the map area.
     card_w = 1200
-    card_h = 520
+    card_h = 600
     map_area_w = 700
     list_area_x = map_area_w + 40
     
@@ -348,11 +348,11 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     else:
         ox, oy, ow, oh = 0, 0, 1000, 500
 
-    target_w = map_area_w - 80
-    target_h = card_h - 175
+    target_w = map_area_w - 40
+    target_h = card_h - 155
     scale = min(target_w / ow, target_h / oh)
     tx = 40 + (target_w - ow * scale) / 2 - ox * scale
-    ty = 130 + (target_h - oh * scale) / 2 - oy * scale
+    ty = 110 + (target_h - oh * scale) / 2 - oy * scale
 
     color_fn = get_color_dark if is_dark else get_color
     empty_fill = '#1e293b' if is_dark else '#ffffff'
