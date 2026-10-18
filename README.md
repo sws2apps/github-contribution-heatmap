@@ -123,5 +123,15 @@ GET /api/heatmap
 
 ## Credits
 
-- Map data source: [sirLisko/world-map-country-shapes](https://github.com/sirLisko/world-map-country-shapes) (based on [SimpleMaps.com](https://simplemaps.com/resources/svg-world))
-- Original SVG licensed under MIT by Pareto Software, LLC.
+- Current map: [amCharts Mercator SVG](https://www.amcharts.com/svg-maps/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), modified. Attribution is included in every generated image.
+- Prepared geometry is copied unchanged from [`ux-git/contributors-map-widget` at c2314d6](https://github.com/ux-git/contributors-map-widget/blob/c2314d6e02c6734a4832e63bef9e22aff2017e60/data/world-mercator.svg). That repository contains the original asset, preparation script and geometry tests.
+- The retained legacy `sirlisko-world-map.svg` is from [sirLisko/world-map-country-shapes](https://github.com/sirLisko/world-map-country-shapes), based on SimpleMaps, MIT by Pareto Software, LLC. It is no longer rendered.
+
+## Validation
+
+```sh
+python tests/test_location_resolution.py
+python -m unittest discover -s tests -p 'test_rendering.py'
+```
+
+Pushing main triggers the connected Vercel deployment. Verify the production response contains `data-map-version="mercator-v2"`; a successful push alone does not prove deployment. The prior server release is `6a729b6e2a59cd97781ad6ed635c6e6c0aaaa4b3`; rollback can be made with a revert commit.

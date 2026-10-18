@@ -178,6 +178,12 @@ def resolve_country_code(location: str | None) -> str | None:
         if key == loc_lower:
             return code
 
+    # Exact ISO names must win over fuzzy matches (Niger versus Nigeria).
+    try:
+        return pycountry.countries.lookup(loc_lower).alpha_2.lower()
+    except LookupError:
+        pass
+
     # 2. Substring match
     for key, code in COUNTRY_MAP:
         if key in loc_lower:

@@ -73,8 +73,8 @@ def get_country_name(code):
 
 
 def load_map_svg():
-    """Load and parse the SirLisko map SVG."""
-    svg_path = os.path.join(os.path.dirname(__file__), 'static', 'sirlisko-world-map.svg')
+    """Load the attributed amCharts Mercator map SVG."""
+    svg_path = os.path.join(os.path.dirname(__file__), 'static', 'world-mercator.svg')
     parser = etree.XMLParser(remove_blank_text=True)
     orig_tree = etree.parse(svg_path, parser)
     return orig_tree.getroot()
@@ -99,14 +99,16 @@ def clone_elements(source, target, is_outline, country_counts, max_count, color_
         node_id = source.get('data-id', '').lower()
     
     clean_id = node_id.lstrip('_')
+    country_code = clean_id.split('-', 1)[0]
     
     if tag in ['path', 'polygon', 'circle', 'rect']:
         if is_outline:
             new_node.set('class', 'country-outline')
+            new_node.set('id', 'outline-' + clean_id)
         else:
             new_node.set('class', 'country-fill')
             found_code = None
-            if len(clean_id) == 2: found_code = clean_id
+            if len(country_code) == 2: found_code = country_code
             elif len(clean_id) > 2:
                 parts = clean_id.split()
                 for p in parts:
@@ -122,6 +124,21 @@ def clone_elements(source, target, is_outline, country_counts, max_count, color_
     
     for child in source:
         clone_elements(child, new_node, is_outline, country_counts, max_count, color_fn, empty_fill)
+
+
+def add_map_credit(svg, card_h, is_dark):
+    """Retain visible attribution and provenance in every exported image."""
+    svg.set("data-map-version", "mercator-v2")
+    etree.SubElement(svg, "metadata").text = (
+        "Map: amCharts https://www.amcharts.com/svg-maps/; "
+        "CC BY 4.0 https://creativecommons.org/licenses/by/4.0/; modified. "
+        "Prepared geometry: ux-git/contributors-map-widget c2314d6."
+    )
+    etree.SubElement(svg, "text", x="40", y=str(card_h - 12),
+                     fill="#94a3b8" if is_dark else "#475569",
+                     attrib={"font-family": "sans-serif", "font-size": "10"}).text = (
+        "Map: amcharts.com · CC BY 4.0 · modified"
+    )
 
 
 def render_map_only(country_counts, theme='light'):
@@ -211,7 +228,7 @@ def render_map_only(country_counts, theme='light'):
         ox, oy, ow, oh = 0, 0, 1000, 500
 
     target_w = card_w - 80
-    target_h = card_h - 110
+    target_h = card_h - 135
     scale = min(target_w / ow, target_h / oh)
     tx = 40 + (target_w - ow * scale) / 2 - ox * scale
     ty = 100 + (target_h - oh * scale) / 2 - oy * scale
@@ -220,13 +237,14 @@ def render_map_only(country_counts, theme='light'):
     empty_fill = '#1e293b' if is_dark else '#ffffff'
     
     fills_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
-    for child in orig_root: 
+    for child in orig_root.findall("{http://www.w3.org/2000/svg}path"):
         clone_elements(child, fills_container, False, country_counts, max_count, color_fn, empty_fill)
     
     outlines_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
-    for child in orig_root: 
+    for child in orig_root.findall("{http://www.w3.org/2000/svg}path"):
         clone_elements(child, outlines_container, True, country_counts, max_count, color_fn, empty_fill)
 
+    add_map_credit(final_svg, card_h, is_dark)
     return etree.tostring(final_svg, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
@@ -331,7 +349,7 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         ox, oy, ow, oh = 0, 0, 1000, 500
 
     target_w = map_area_w - 80
-    target_h = card_h - 150
+    target_h = card_h - 175
     scale = min(target_w / ow, target_h / oh)
     tx = 40 + (target_w - ow * scale) / 2 - ox * scale
     ty = 130 + (target_h - oh * scale) / 2 - oy * scale
@@ -340,11 +358,11 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
     empty_fill = '#1e293b' if is_dark else '#ffffff'
     
     fills_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
-    for child in orig_root: 
+    for child in orig_root.findall("{http://www.w3.org/2000/svg}path"):
         clone_elements(child, fills_container, False, country_counts, max_count, color_fn, empty_fill)
     
     outlines_container = etree.SubElement(final_svg, "g", transform=f"translate({tx}, {ty}) scale({scale})")
-    for child in orig_root: 
+    for child in orig_root.findall("{http://www.w3.org/2000/svg}path"):
         clone_elements(child, outlines_container, True, country_counts, max_count, color_fn, empty_fill)
 
     list_x = list_area_x + 15
@@ -402,6 +420,7 @@ def render_map_with_list(country_counts: dict, theme: str = "light") -> bytes:
         y = list_start_y + max_display * row_spacing + row_spacing * 0.5
         etree.SubElement(final_svg, "text", x=str(list_x), y=str(y + 4), attrib={"class": "list-title"}).text = f"+{remaining} more countries"
 
+    add_map_credit(final_svg, card_h, is_dark)
     return etree.tostring(final_svg, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
